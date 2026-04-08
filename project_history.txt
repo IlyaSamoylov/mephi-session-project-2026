@@ -1,0 +1,66 @@
+   1  nmcli dev status
+   2  ip route
+   3  sudo nmcli con mod "Проводное подключение 1" ipv4.addresses 192.168.0.150/24
+   4  sudo nmcli con mod "Проводное подключение 1" ipv4.gateway 192.168.0.1
+   5  sudo nmcli con mod "Проводное подключение 1" ipv4.dns 8.8.8.8
+   6  sudo nmcli con mod "Проводное подключение 1" ipv4.method manual
+   7  sudo nmcli con up "Проводное подключение 1" 
+   8  sudo hostnamectl set-hostname mephi-2026.domain.local
+   9  ip route
+  10  ping -c 4 8.8.8.8 > /tmp/network_check.txt
+  11  ping -c 4 192.168.0.1 >> /tmp/network_check.txt
+  12  sudo dnf install -y nginx tcpdump libcap-ng-utils
+  13  dnf download --destdir=/tmp tcpdump
+  14  sudo rpm -Uvh /tmp/tcpdump-*.rpm
+  15  rpm -q tcpdump
+  16  lsblk -f
+  17  sudo fdisk -l /dev/sdb
+  18  sudo fdisk /dev/sdb
+  19  sudo mkfs.ext4 -L MEPHI_DATA /dev/sdb1
+  20  sudo mkdir -p /data/mephi-web
+  21  echo 'LABEL=MEPHI_DATA /data/mephi-web ext4 defaults 0 2' | sudo tee -a /etc/fstab
+  22  sudo mount -a
+  23  systemctl daemon-reload
+  24  sudo mount -a
+  25  df -h /data/mephi-web
+  26  lsblk -f
+  27  sudo systemctl enable --now nginx
+  28  journalctl -u nginx --since "5 minutes ago" > /tmp/nginx_recent_logs.txt
+  29  grep -R "root " /etc/nginx
+  30  sudo nano /etc/nginx/nginx.conf
+  31  sudo nginx -t
+  32  sudo systemctl restart nginx
+  33  sudo groupadd mephi-devs
+  34  sudo useradd -m -G mephi-devs mephi-admin
+  35  echo 'mephi-admin:P@ssw0rd2026' | sudo chpasswd
+  36  sudo chown mephi-admin:mephi-devs /data/mephi-web
+  37  sudo chmod 2775 /data/mephi-web
+  38  getenforce
+  39  sudo setenforce 1
+  40  sudo nano /etc/selinux/config
+  41  sudo semanage fcontext -a -t httpd_sys_content_t '/data/mephi-web(/.*)?'
+  42  sudo restorecon -Rv /data/mephi-web
+  43  sudo chmod u-s /usr/sbin/tcpdump
+  44  sudo setcap cap_net_raw,cap_net_admin+ep /usr/sbin/tcpdump
+  45  sudo -u mephi-admin tcpdump --help
+  46  echo "root" | sudo tee /etc/ssh/denied_users
+  47  sudo nano /etc/pam.d/login
+  48  sudo nano /etc/pam.d/sshd
+  49  sudo -u mephi-admin bash -c 'echo "Hello from Student: 2551096" > /data/mephi-web/index.html'
+  50  curl http://localhost
+  51  curl http://192.168.0.150
+  52  systemctl status firewalld
+  53  sudo firewall-cmd --permanent --add-service=http
+  54  sudo firewall-cmd --reload
+  55  curl http://192.168.0.150
+  56  curl http://localhost
+  57  mkdir -p ~/lab_artifacts
+  58  cp /etc/fstab ~/lab_artifacts/fstab.txt
+  59  getenforce > ~/lab_artifacts/selinux_status.txt
+  60  ls -Zd /data/mephi-web > ~/lab_artifacts/file_contexts.txt
+  61  getcap /usr/sbin/tcpdump > ~/lab_artifacts/tcpdump_capabilities.txt
+  62  stat /data/mephi-web > ~/lab_artifacts/permissions.txt
+  63  id mephi-admin > ~/lab_artifacts/users_groups.txt
+  64  getent group mephi-devs >> ~/lab_artifacts/users_groups.txt
+  65  curl -s http://192.168.0.150 > ~/lab_artifacts/curl_output.txt
+  66  history > ~/lab_artifacts/project_history.txt
